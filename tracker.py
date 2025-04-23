@@ -14,7 +14,7 @@ faces = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_d
 counter = 0
 velocity_x = 0
 velocity_y = 0
-square_side_half = 100
+square_side_half = int(input("The size of the bounding square's side: "))//2
 face_center_previous = (cap.get(cv2.CAP_PROP_FRAME_WIDTH)//2, cap.get(cv2.CAP_PROP_FRAME_HEIGHT)//2)
 
 while True:
@@ -47,18 +47,28 @@ while True:
         upper = face_center[1] < top_point
         lower = face_center[1] > bottom_point
 
+        obj_vector = ''
+        obj_pos = ''
+
         if not (to_the_left or upper or to_the_right or lower):
             cv2.rectangle(img, (left_point, top_point), (right_point, bottom_point), (0, 255, 0), 2)
-        elif to_the_left:
-            put_text('LEFT', (10, 70))
-        elif upper:
-            put_text('UP', (10, 70))
-        elif to_the_right:
-            put_text('RIGHT', (10, 70))
         else:
-            put_text('DOWN', (10, 70))
+            if to_the_left:
+                obj_vector += 'LEFT '
+                obj_pos += f'Objx: {str(face_center[0] - left_point)} '
+            elif to_the_right:
+                obj_vector += 'RIGHT '
+                obj_pos += f'Objx: {str(face_center[0] - right_point)} '
+            if upper:
+                obj_vector += 'UP'
+                obj_pos += f'Objy: {str(-(face_center[1] - top_point))}'
+            elif lower:
+                obj_vector += 'DOWN'
+                obj_pos += f'Objy: {str(-(face_center[1] - bottom_point))}'
 
         put_text(f'Vx: {int(velocity_x)}, Vy: {int(velocity_y)}', (10, 30))
+        put_text(obj_vector, (10, 70))
+        put_text(obj_pos, (10, 110))
 
     counter += 1
 
